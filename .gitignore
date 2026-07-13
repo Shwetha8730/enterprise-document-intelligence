@@ -5,3 +5,4 @@ venv/
 docintel/
 uploaded_docs/
 doc_intelligence.db
+tools/

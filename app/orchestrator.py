@@ -1,4 +1,5 @@
 from app.classifier import DocumentClassifier
+from app.semantic_classifier import SemanticClassifier
 from app.metadata_extractor import extract_metadata
 from app.agents.summarizer_agent import SummarizerAgent
 from app.agents.qa_agent import QAAgent
@@ -14,6 +15,7 @@ class DocumentOrchestrator:
         database.init_db()
 
         self.classifier = DocumentClassifier()
+        self.semantic_classifier = SemanticClassifier()
         self.summarizer_agent = SummarizerAgent()
         self.qa_agent = QAAgent()
         self.completeness_agent = CompletenessAgent()
@@ -25,9 +27,24 @@ class DocumentOrchestrator:
     def process(self, doc_id: str, filename: str, text: str) -> dict:
         database.log_action(doc_id, "uploaded", f"filename={filename}")
 
-        classification = self.classifier.classify(text)
+        traditional_result = self.classifier.classify(text)
+        semantic_result = self.semantic_classifier.classify(text)
+
+        if semantic_result["confidence"] >= traditional_result["confidence"]:
+           classification = semantic_result.copy()
+           classification["model"] = "SentenceTransformer + LogisticRegression"
+        else:
+           classification = traditional_result.copy()
+           classification["model"] = "TF-IDF + NaiveBayes"
+
         doc_type = classification["predicted_type"]
-        database.log_action(doc_id, "classified", f"type={doc_type}, confidence={classification['confidence']}")
+
+        database.log_action(doc_id,
+                            "classified", 
+                            f"type={doc_type}, " 
+                            f"confidence={classification['confidence']}, "
+                            f"model={classification['model']}",
+                        )
 
         metadata = extract_metadata(text, doc_type=doc_type)
         database.log_action(doc_id, "metadata_extracted",

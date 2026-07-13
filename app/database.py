@@ -2,6 +2,7 @@ import sqlite3
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 from contextlib import contextmanager
 
 DB_PATH = Path(__file__).parent.parent / "doc_intelligence.db"
@@ -85,7 +86,7 @@ def list_documents() -> list[dict]:
         return [dict(r) for r in rows]
 
 
-def get_audit_log(doc_id: str = None, limit: int = 100) -> list[dict]:
+def get_audit_log(doc_id: str = None, limit: int = 100):
     with get_connection() as conn:
         if doc_id:
             rows = conn.execute(

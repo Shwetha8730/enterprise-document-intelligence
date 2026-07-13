@@ -8,3 +8,6 @@ pydantic>=2.0
 streamlit>=1.32
 sentence-transformers>=3.0
 faiss-cpu>=1.8
+easyocr>=1.7
+Pillow>=10.0
+pdf2image>=1.17

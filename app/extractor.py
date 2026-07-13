@@ -1,25 +1,65 @@
-import pdfplumber
 from pathlib import Path
+import numpy as np
+import pdfplumber
+import easyocr
+from pdf2image import convert_from_path
+
+
+POPPLER_PATH = Path(__file__).resolve().parent.parent / "tools" / "poppler-26.02.0" / "Library" / "bin"
+
+
+reader = easyocr.Reader(["en"], gpu=False)
+
 
 def extract_text(file_path: str) -> str:
     ext = Path(file_path).suffix.lower()
 
     if ext == ".pdf":
         return _extract_pdf(file_path)
+
     elif ext in (".txt", ".md"):
         return _extract_txt(file_path)
+
     else:
         raise ValueError(f"Unsupported file type: {ext}")
 
 
 def _extract_pdf(file_path: str) -> str:
     text_chunks = []
+
     with pdfplumber.open(file_path) as pdf:
         for page in pdf.pages:
             page_text = page.extract_text()
-            if page_text:
+
+            if page_text and page_text.strip():
                 text_chunks.append(page_text)
-    return "\n".join(text_chunks)
+
+    extracted_text = "\n".join(text_chunks).strip()
+
+    if len(extracted_text) > 50:
+        return extracted_text
+
+    return _extract_pdf_with_ocr(file_path)
+
+
+def _extract_pdf_with_ocr(file_path: str) -> str:
+    pages = convert_from_path(
+        file_path,
+        dpi=300,
+        poppler_path=POPPLER_PATH,
+    )
+
+    full_text = []
+
+    for page in pages:
+        page_array = np.array(page)
+        results = reader.readtext(page_array)
+
+        page_text = " ".join([r[1] for r in results])
+
+        full_text.append(page_text)
+
+    return "\n".join(full_text)
 
 
 def _extract_txt(file_path: str) -> str:

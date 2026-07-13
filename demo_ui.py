@@ -1,12 +1,4 @@
-"""
-demo_ui.py
------------
-Streamlit front-end for the Enterprise AI Document Intelligence Platform.
-Run with:
-    streamlit run demo_ui.py
-"""
-
-import uuid
+import hashlib
 import tempfile
 from pathlib import Path
 import streamlit as st
@@ -50,13 +42,24 @@ tab1, tab2, tab3 = st.tabs(["📤 Upload & Analyze", "🔍 Semantic Search", "�
 
 with tab1:
 
-    uploaded_files = st.file_uploader("Upload document(s) (.pdf or .txt)", type=["pdf", "txt"], accept_multiple_files=True)
+    uploaded_files = st.file_uploader(
+        "Upload document(s) (.pdf or .txt)",
+        type=["pdf", "txt"],
+        accept_multiple_files=True,
+    )
 
     if uploaded_files:
         for uploaded_file in uploaded_files:
 
-            already_uploaded = uploaded_file.name in [doc["filename"] for doc in st.session_state.docs.values()]
-            if already_uploaded:
+            # Generate a unique ID based on file content
+            uploaded_file.seek(0)
+            file_bytes = uploaded_file.read()
+            doc_id = hashlib.sha256(file_bytes).hexdigest()[:8]
+            uploaded_file.seek(0)
+
+            # Skip duplicate uploads
+            if doc_id in st.session_state.docs:
+                st.info(f"{uploaded_file.name} has already been processed.")
                 continue
 
             suffix = Path(uploaded_file.name).suffix
@@ -65,13 +68,25 @@ with tab1:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
+            uploaded_file.seek(0)
+
             text = extract_text(tmp_path)
-            doc_id = str(uuid.uuid4())[:8]
 
-            with st.spinner(f"Processing '{uploaded_file.name}' using the AI multi-agent pipeline..."):
-                result = orchestrator.process(doc_id=doc_id, filename=uploaded_file.name, text=text)
+            with st.spinner(
+                f"Processing '{uploaded_file.name}' using the AI multi-agent pipeline..."
+            ):
+                result = orchestrator.process(
+                    doc_id=doc_id,
+                    filename=uploaded_file.name,
+                    text=text,
+                )
 
-            st.session_state.docs[doc_id] = {"text": text, "result": result, "filename": uploaded_file.name}
+            st.session_state.docs[doc_id] = {
+                "text": text,
+                "result": result,
+                "filename": uploaded_file.name,
+            }
+
             st.session_state.current_doc_id = doc_id
             st.success(f"Processed: {uploaded_file.name}")
 
@@ -81,7 +96,12 @@ with tab1:
             "Select a processed document",
             options=list(st.session_state.docs.keys()),
             format_func=lambda d: st.session_state.docs[d]["filename"],
-            index=list(st.session_state.docs.keys()).index(st.session_state.get("current_doc_id", list(st.session_state.docs.keys())[0])),
+            index=list(st.session_state.docs.keys()).index(
+                st.session_state.get(
+                    "current_doc_id",
+                    list(st.session_state.docs.keys())[0],
+                )
+            ),
         )
 
         doc = st.session_state.docs[doc_id]
@@ -137,7 +157,7 @@ with tab2:
 
         else:
 
-            search_result = orchestrator.semantic_search(query, top_k=5)
+            search_result = orchestrator.semantic_search(query, top_k=3)
 
             if not search_result["results"]:
                 st.info("No matching documents found.")
@@ -168,7 +188,7 @@ with tab3:
     logs = database.get_audit_log(limit=200)
 
     if logs:
-        st.dataframe(logs, width="stretch")
+        st.table(logs)
 
     else:
         st.info("No actions logged yet. Process a document to populate the audit trail.")
