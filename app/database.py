@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 from contextlib import contextmanager
+from collections import Counter
 
 DB_PATH = Path(__file__).parent.parent / "doc_intelligence.db"
 
@@ -98,3 +99,71 @@ def get_audit_log(doc_id: str = None, limit: int = 100):
                 "SELECT * FROM audit_log ORDER BY timestamp DESC LIMIT ?", (limit,)
             ).fetchall()
         return [dict(r) for r in rows]
+
+def get_dashboard_stats():
+    with get_connection() as conn:
+
+        docs = conn.execute("""
+            SELECT doc_type, confidence, uploaded_at
+            FROM documents
+        """).fetchall()
+
+    docs = [dict(r) for r in docs]
+
+    total_documents = len(docs)
+
+    if total_documents == 0:
+        return {
+            "total_documents": 0,
+            "average_confidence": 0,
+            "document_types": {},
+            "uploads_per_day": {},
+            "confidence_by_type": {},
+        }
+
+    # --------------------------
+    # Document Type Counts
+    # --------------------------
+    type_counts = Counter(
+        d["doc_type"].title() if d["doc_type"] else "Unknown"
+        for d in docs
+    )
+
+    # --------------------------
+    # Average Confidence
+    # --------------------------
+    avg_conf = (
+        sum(d["confidence"] for d in docs if d["confidence"] is not None)
+        / total_documents
+    )
+
+    # --------------------------
+    # Uploads Per Day
+    # --------------------------
+    uploads = Counter(
+        d["uploaded_at"][:10]
+        for d in docs
+    )
+
+    # --------------------------
+    # Confidence by Type
+    # --------------------------
+    confidence = {}
+
+    for t in type_counts.keys():
+        vals = [
+            d["confidence"]
+            for d in docs
+            if d["doc_type"]
+            and d["doc_type"].title() == t
+        ]
+
+        confidence[t] = round(sum(vals) / len(vals), 3)
+
+    return {
+        "total_documents": total_documents,
+        "average_confidence": round(avg_conf, 3),
+        "document_types": dict(type_counts),
+        "uploads_per_day": dict(uploads),
+        "confidence_by_type": confidence,
+    }

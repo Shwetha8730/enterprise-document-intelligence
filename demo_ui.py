@@ -36,7 +36,7 @@ with col2:
 
 st.markdown("---")
 
-tab1, tab2, tab3 = st.tabs(["📤 Upload & Analyze", "🔍 Semantic Search", "🧾 Audit Log"])
+tab1, tab2, tab3 , tab4 = st.tabs(["📤 Upload & Analyze", "🔍 Semantic Search", "🧾 Audit Log","📊 Analytics",])
 
 # ------------------------------------------------------------ TAB 1
 
@@ -193,7 +193,61 @@ with tab3:
     else:
         st.info("No actions logged yet. Process a document to populate the audit trail.")
 
+# ------------------------------------------------------------ TAB 4
 
+with tab4:
+
+    st.subheader("📊 Analytics Dashboard")
+
+    stats = database.get_dashboard_stats()
+
+    confidence_percent = {}
+
+    if stats["confidence_by_type"]:
+       confidence_percent = {
+          k: v * 100
+          for k, v in stats["confidence_by_type"].items()
+    }
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+      st.subheader("📂 Document Distribution")
+      st.bar_chart(stats["document_types"])
+
+    with col2:
+       st.subheader("📈 Classification Confidence (%)")
+
+       if confidence_percent:
+           st.bar_chart(confidence_percent)
+       else:
+           st.info("No confidence data available.")
+
+    st.markdown("### 📂 Document Types")
+
+    counts = stats["document_types"]
+
+    c1, c2, c3, c4 = st.columns(4)
+
+    c1.metric("🧾 Invoice", counts.get("Invoice", 0))
+    c2.metric("📄 Resume", counts.get("Resume", 0))
+    c3.metric("📜 Contract", counts.get("Contract", 0))
+    c4.metric("📧 Email", counts.get("Email", 0))
+
+    st.markdown("---")
+
+    st.subheader("📅 Upload Activity")
+
+    if len(stats["uploads_per_day"]) > 1:
+       st.line_chart(stats["uploads_per_day"])
+    elif stats["uploads_per_day"]:
+       st.metric(
+         "Today's Uploads",
+          list(stats["uploads_per_day"].values())[0]
+    )
+    else:
+       st.info("No upload activity yet.")
+    
 st.markdown("---")
 
 st.caption(
