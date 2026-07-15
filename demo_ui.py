@@ -85,7 +85,8 @@ with tab1:
                 "text": text,
                 "result": result,
                 "filename": uploaded_file.name,
-            }
+                "filepath": tmp_path,
+             }
 
             st.session_state.current_doc_id = doc_id
             st.success(f"Processed: {uploaded_file.name}")
@@ -106,6 +107,7 @@ with tab1:
 
         doc = st.session_state.docs[doc_id]
         result = doc["result"]
+        pdf_path = doc["filepath"]
 
         col1, col2 = st.columns(2)
 
@@ -120,10 +122,23 @@ with tab1:
 
         with col2:
             st.subheader("🔎 Extracted Metadata")
-            for key, val in result["metadata"].items():
-                if val and key != "missing_fields":
-                    st.markdown(f"**{key.replace('_', ' ').title()}:** {', '.join(val) if isinstance(val, list) else val}")
 
+            for key, val in result["metadata"].items():
+               if val and key != "missing_fields":
+                  st.markdown(
+                f"**{key.replace('_', ' ').title()}:** "
+                f"{', '.join(val) if isinstance(val, list) else val}"
+            )
+
+            st.subheader("📄Original Document")
+
+            with open(pdf_path, "rb") as pdf_file:
+                st.download_button(
+                 label="📥 Download Original Document",
+                 data=pdf_file,
+                 file_name=doc["filename"],
+                 mime="application/pdf",
+)
         st.subheader("📝 Auto-Generated Summary")
         st.info(result["summary"])
 

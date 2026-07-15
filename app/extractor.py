@@ -4,12 +4,15 @@ import pdfplumber
 import easyocr
 from pdf2image import convert_from_path
 
+POPPLER_PATH = str(
+    Path(__file__).resolve().parent.parent
+    / "tools"
+    / "poppler-26.02.0"
+    / "Library"
+    / "bin"
+)
 
-POPPLER_PATH = Path(__file__).resolve().parent.parent / "tools" / "poppler-26.02.0" / "Library" / "bin"
-
-
-reader = easyocr.Reader(["en"], gpu=False)
-
+reader = None
 
 def extract_text(file_path: str) -> str:
     ext = Path(file_path).suffix.lower()
@@ -41,8 +44,12 @@ def _extract_pdf(file_path: str) -> str:
 
     return _extract_pdf_with_ocr(file_path)
 
-
 def _extract_pdf_with_ocr(file_path: str) -> str:
+    global reader
+
+    if reader is None:
+       reader = easyocr.Reader(["en"], gpu=False)
+
     pages = convert_from_path(
         file_path,
         dpi=300,
@@ -56,7 +63,6 @@ def _extract_pdf_with_ocr(file_path: str) -> str:
         results = reader.readtext(page_array)
 
         page_text = " ".join([r[1] for r in results])
-
         full_text.append(page_text)
 
     return "\n".join(full_text)
