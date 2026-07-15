@@ -6,3 +6,5 @@ docintel/
 uploaded_docs/
 doc_intelligence.db
 tools/
+.vscode/
+analysis_report.pdf

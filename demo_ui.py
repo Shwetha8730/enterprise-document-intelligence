@@ -6,6 +6,7 @@ import streamlit as st
 from app.extractor import extract_text
 from app.orchestrator import DocumentOrchestrator
 from app import database
+from app.report_generator import generate_pdf_report
 
 st.set_page_config(page_title="Enterprise AI Document Intelligence Platform", page_icon="📄", layout="wide")
 
@@ -141,6 +142,20 @@ with tab1:
 )
         st.subheader("📝 Auto-Generated Summary")
         st.info(result["summary"])
+
+        report_path = generate_pdf_report(
+            doc["filename"],
+            result,
+)
+
+        with open(report_path, "rb") as pdf:
+
+          st.download_button(
+              "📄 Export Analysis Report (PDF)",
+              pdf,
+              file_name=f"{doc['filename']}_analysis_report.pdf",
+              mime="application/pdf",
+    )
 
         st.subheader("💬 Ask a question about this document")
 
