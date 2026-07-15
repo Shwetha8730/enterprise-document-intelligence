@@ -13,7 +13,7 @@ st.set_page_config(page_title="Enterprise AI Document Intelligence Platform", pa
 st.title("📄 Enterprise AI Document Intelligence Platform")
 st.subheader("AI-Powered Multi-Agent Document Processing System")
 st.markdown("---")
-st.caption("Multi-agent document classification, metadata extraction, RAG-based semantic search, and Q&A — built as a project inspired by OpenText's Enterprise Information Management / AI Engineering internship role.")
+st.caption("Multi-agent document classification, metadata extraction, semantic search, and question answering using AI-powered document processing.")
 
 @st.cache_resource
 def get_orchestrator():
@@ -108,7 +108,7 @@ with tab1:
 
         doc = st.session_state.docs[doc_id]
         result = doc["result"]
-        pdf_path = doc["filepath"]
+        file_path = doc["filepath"]
 
         col1, col2 = st.columns(2)
 
@@ -131,15 +131,20 @@ with tab1:
                 f"{', '.join(val) if isinstance(val, list) else val}"
             )
 
-            st.subheader("📄Original Document")
+            st.subheader("📄 Original Document")
 
-            with open(pdf_path, "rb") as pdf_file:
-                st.download_button(
-                 label="📥 Download Original Document",
-                 data=pdf_file,
-                 file_name=doc["filename"],
-                 mime="application/pdf",
-)
+            if file_path.endswith(".pdf"):
+               mime_type = "application/pdf"
+            else:
+               mime_type = "text/plain"
+
+            with open(file_path, "rb") as file:
+               st.download_button(
+                   label="📥 Download Original Document",
+                   data=file,
+                   file_name=doc["filename"],
+                   mime=mime_type,
+    )
         st.subheader("📝 Auto-Generated Summary")
         st.info(result["summary"])
 
@@ -148,11 +153,11 @@ with tab1:
             result,
 )
 
-        with open(report_path, "rb") as pdf:
+        with open(report_path, "rb") as report_file:
 
           st.download_button(
               "📄 Export Analysis Report (PDF)",
-              pdf,
+              report_file,
               file_name=f"{doc['filename']}_analysis_report.pdf",
               mime="application/pdf",
     )
