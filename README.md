@@ -158,7 +158,9 @@ Through this project, I gained practical experience in:
 ## 👩‍💻 Author
 
 **Shwethashree S**
+
 B.Tech – Information Science & Engineering (AI & Robotics)
-Presidency University, Bengaluru
+
+Presidency University, Bengaluru.
 
 ---
