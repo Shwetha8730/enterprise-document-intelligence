@@ -7,6 +7,7 @@ from app.extractor import extract_text
 from app.orchestrator import DocumentOrchestrator
 from app import database
 from app.report_generator import generate_pdf_report
+from mimetypes import guess_type
 
 st.set_page_config(page_title="Enterprise AI Document Intelligence Platform", page_icon="📄", layout="wide")
 
@@ -44,10 +45,21 @@ tab1, tab2, tab3 , tab4 = st.tabs(["📤 Upload & Analyze", "🔍 Semantic Searc
 with tab1:
 
     uploaded_files = st.file_uploader(
-        "Upload document(s) (.pdf or .txt)",
-        type=["pdf", "txt"],
+        "Upload document(s) (PDF, TXT, DOCX, XLSX, CSV, PPTX, PNG, JPG, JPEG)",
+        type=[
+    "pdf",
+    "txt",
+    "docx",
+    "xlsx",
+    "csv",
+    "pptx",
+    "png",
+    "jpg",
+    "jpeg",
+],
         accept_multiple_files=True,
     )
+    st.caption("Supported formats: PDF, TXT, DOCX, XLSX, CSV, PPTX, PNG, JPG, JPEG")
 
     if uploaded_files:
         for uploaded_file in uploaded_files:
@@ -133,11 +145,10 @@ with tab1:
 
             st.subheader("📄 Original Document")
 
-            if file_path.endswith(".pdf"):
-               mime_type = "application/pdf"
-            else:
-               mime_type = "text/plain"
+            mime_type, _ = guess_type(file_path)
 
+            if mime_type is None:
+              mime_type = "application/octet-stream"
             with open(file_path, "rb") as file:
                st.download_button(
                    label="📥 Download Original Document",
@@ -175,7 +186,17 @@ with tab1:
             st.text(doc["text"])
 
     else:
-        st.info("Upload one or more documents above to see the multi-agent pipeline in action. Try the sample invoice or resume in app/sample_docs/ if you don't have one handy.")
+        st.info(
+    "Upload one or more documents to explore the AI pipeline.\n\n"
+    "Supported formats:\n"
+    "- PDF\n"
+    "- TXT\n"
+    "- DOCX\n"
+    "- XLSX\n"
+    "- CSV\n"
+    "- PPTX\n"
+    "- PNG / JPG / JPEG"
+)
 
 # ------------------------------------------------------------ TAB 2
 
