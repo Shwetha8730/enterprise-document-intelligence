@@ -9,6 +9,9 @@ KEYWORD_HINTS = {
     "resume": ["objective", "work experience", "education", "skills", "curriculum vitae", "references"],
     "contract": ["agreement", "party", "whereas", "hereby", "terms and conditions", "effective date"],
     "email": ["subject:", "dear", "regards", "best regards", "from:", "to:", "sent:"],
+    "spreadsheet": ["employee id", "sales report", "inventory", "designation", "department", "quantity", "price", "stock", "location",],
+    "presentation":["project proposal", "presentation", "slide", "agenda", "objectives", "overview", "thank you", "conclusion", "architecture", "implementation"],
+    "letter":["dear sir", "subject", "offer letter", "recommendation", "leave application", "sincerely"]
 }
 
 class DocumentClassifier:
