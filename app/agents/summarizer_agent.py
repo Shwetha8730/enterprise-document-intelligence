@@ -2,6 +2,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from app.text_utils import split_sentences
 
 
+MAX_SUMMARY_CHARS = 600
+
 class SummarizerAgent:
     name = "summarizer_agent"
 
@@ -12,12 +14,16 @@ class SummarizerAgent:
         else:
             summary = self._extractive_summary(sentences, num_sentences)
 
+        # Safety net: never return an unbounded "summary"
+        if len(summary) > MAX_SUMMARY_CHARS:
+            summary = summary[:MAX_SUMMARY_CHARS].rsplit(" ", 1)[0] + "…"
+
         return {
             "agent": self.name,
             "summary": summary,
             "original_sentence_count": len(sentences),
         }
-
+    
     @staticmethod
     def _extractive_summary(sentences, num_sentences):
         vectorizer = TfidfVectorizer(stop_words="english")

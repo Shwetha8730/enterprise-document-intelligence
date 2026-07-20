@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Document Intelligence Platform</title>
+<link rel="stylesheet" href="/static/css/styles.css" />
+<link rel="icon" href="/static/favicon.ico">
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-inner">
+        <div class="brand">
+            <div class="brand-mark">DI</div>
+            <div class="brand-text">Document<span>Intel</span></div>
+        </div>
+        <nav class="nav-segment" id="nav-segment">
+            <button data-view="upload" class="active">Upload &amp; Analyze</button>
+            <button data-view="search">Semantic Search</button>
+            <button data-view="audit">Audit Log</button>
+            <button data-view="analytics">Analytics</button>
+        </nav>
+        <div class="mode-pill" id="mode-pill">
+            <span class="mode-dot"></span>
+            <span id="mode-pill-text">connecting…</span>
+        </div>
+    </div>
+</div>
+
+<div class="app-shell">
+
+    <section class="hero">
+        <div class="hero-copy">
+            <div class="hero-brand">
+               <div class="hero-mark">DI</div>
+               <div>
+                  <h1 class="hero-title"> Document<span>Intel</span> </h1>
+                  <h2 class="hero-subtitle"> Enterprise AI Document Intelligence Platform </h2>
+                  <p class="hero-description">
+            Intelligent document classification, metadata extraction,
+            <br>semantic search, and AI-powered question answering. </p></br></p>
+    </div>
+</div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="num" id="hero-doc-count">0</div>
+                    <div class="label">Documents processed</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="num" id="hero-formats">9</div>
+                    <div class="label">Formats supported</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="num" id="hero-mode">—</div>
+                    <div class="label">Embedding model</div>
+                </div>
+            </div>
+        </div>
+        <div class="scan-doc">
+            <div class="scan-doc-title"><span>invoice_04821.pdf</span><span>scanning…</span></div>
+            <div class="scan-line" style="width: 88%"></div>
+            <div class="scan-line" style="width: 64%"></div>
+            <div class="scan-line" style="width: 76%"></div>
+            <div style="margin: 14px 0;">
+                <span class="scan-field">vendor · Acme Supply Co.</span>
+                <span class="scan-field">due · Aug 04</span>
+            </div>
+            <div class="scan-line" style="width: 52%"></div>
+            <div class="scan-line" style="width: 70%"></div>
+            <div style="margin: 14px 0 0;">
+                <span class="scan-field">amount · $4,280.00</span>
+                <span class="scan-field">type · invoice</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ UPLOAD & ANALYZE ============ -->
+    <div class="view active" id="view-upload">
+
+        <div class="section-header">
+            <div>
+                <h2>Upload &amp; analyze</h2>
+                <p class="section-sub">PDF · TXT · DOCX · XLSX · CSV · PPTX · PNG · JPG · JPEG</p>
+            </div>
+        </div>
+
+        <div class="dropzone" id="dropzone">
+            <div class="icon">⇪</div>
+            <div class="title">Drop files here or click to browse</div>
+            <div class="sub">Files are hashed on upload — re-processing the same file is instant.</div>
+            <input type="file" id="file-input" multiple hidden
+                accept=".pdf,.txt,.docx,.xlsx,.csv,.pptx,.png,.jpg,.jpeg" />
+        </div>
+
+        <div class="doc-list" id="doc-list"></div>
+
+        <div id="upload-empty" class="empty-state">
+            <div class="icon">📄</div>
+            <div class="title">No documents yet</div>
+            <div class="sub">Upload a document above to see classification, extracted metadata, and a generated summary.</div>
+        </div>
+
+        <div id="doc-detail" style="display:none;">
+
+            <div class="grid-2">
+                <div>
+                    <div class="card">
+                        <div class="eyebrow-label">Classification</div>
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+                            <span id="pred-type" style="font-family:var(--font-display); font-size:20px; font-weight:600;"></span>
+                            <span id="pred-confidence" class="badge badge-accent"></span>
+                        </div>
+                        <div id="score-bars"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="eyebrow-label">Completeness check</div>
+                        <div id="completeness-badge"></div>
+                        <p id="completeness-text" style="color:var(--text-secondary); font-size:13.5px; margin:10px 0 0;"></p>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="card">
+                        <div class="eyebrow-label">Extracted metadata</div>
+                        <div id="metadata-list"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="eyebrow-label">Original document</div>
+                        <button class="btn" id="download-original" style="width:100%; justify-content:center;">Download original file</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+               <div class="eyebrow-label">Auto-generated summary</div>
+
+               <p id="doc-summary"></p>
+
+               <button class="btn btn-primary export-btn" id="download-report">
+                    📄 Export Analysis Report (PDF)
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="eyebrow-label">Ask a question about this document</div>
+                <div style="display:flex; gap:10px; margin-top:6px;">
+                    <input type="text" class="text-input" id="question-input" placeholder="What is the total amount due?" />
+                    <button class="btn btn-primary" id="ask-btn">Ask</button>
+                </div>
+                <div id="answer-box" style="margin-top:14px; display:none;">
+                    <p style="margin:0 0 4px; font-size:14px;"><strong>Answer:</strong> <span id="answer-text"></span></p>
+                    <p style="margin:0; font-size:12px; color:var(--text-muted); font-family:var(--font-mono);" id="answer-meta"></p>
+                </div>
+            </div>
+
+            <details class="raw-details">
+                <summary>View raw extracted text</summary>
+                <pre class="raw-text" id="raw-text"></pre>
+            </details>
+        </div>
+    </div>
+
+    <!-- ============ SEMANTIC SEARCH ============ -->
+    <div class="view" id="view-search">
+        <div class="section-header">
+            <div>
+                <h2>Semantic search</h2>
+                <p class="section-sub">Matches on meaning, not just exact keywords — searching "invoices from Microsoft" can surface a document that says "Redmond-based software vendor."</p>
+            </div>
+        </div>
+        <input type="text" class="text-input" id="search-input" placeholder="e.g. invoices from technology vendors" style="margin-bottom:20px;" />
+        <div id="search-results"></div>
+        <div id="search-empty" class="empty-state">
+            <div class="icon">🔍</div>
+            <div class="title">Search across every processed document</div>
+            <div class="sub">Results are ranked by semantic similarity, not keyword overlap.</div>
+        </div>
+    </div>
+
+    <!-- ============ AUDIT LOG ============ -->
+    <div class="view" id="view-audit">
+        <div class="section-header">
+            <div>
+                <h2>Audit trail</h2>
+                <p class="section-sub">Every action taken on every document, with timestamps — mirrors the compliance and traceability requirements of a real enterprise content platform.</p>
+            </div>
+        </div>
+        <div class="log-stream" id="log-stream"></div>
+    </div>
+
+    <!-- ============ ANALYTICS ============ -->
+    <div class="view" id="view-analytics">
+        <div class="section-header">
+            <div><h2>Analytics</h2></div>
+        </div>
+
+        <div class="stat-row" id="type-stat-row"></div>
+
+        <div class="grid-2">
+            <div class="card">
+                <div class="eyebrow-label">Document distribution</div>
+                <canvas id="chart-distribution" height="220"></canvas>
+            </div>
+            <div class="card">
+                <div class="eyebrow-label">Classification confidence (%)</div>
+                <canvas id="chart-confidence" height="220"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+             <div class="eyebrow-label">Upload Activity</div>
+             <div class="upload-activity">
+                <div class="upload-title">Documents Processed</div>
+                <div class="upload-number" id="upload-count"> 0 </div>
+              </div>
+           </div>
+       </div>
+
+</div>
+
+<footer class="app-footer">FastAPI · Custom frontend · spaCy · FAISS · Sentence Transformers · SQLite</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="/static/js/chart.umd.min.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

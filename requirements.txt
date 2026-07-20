@@ -16,3 +16,6 @@ openpyxl
 python-pptx
 pandas
 Pillow
+fastapi
+uvicorn[standard]
+python-multipart

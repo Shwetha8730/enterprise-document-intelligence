@@ -1,12 +1,21 @@
 import re
 
+def _clean_text(text: str) -> str:
+    # Strip stray "_" used as visual separators in resume/PDF templates
+    text = re.sub(r"\s+_+\s+", ". ", text)
+    text = re.sub(r"_{2,}", " ", text)
+    return text
+
 def split_sentences(text: str):
+    text = _clean_text(text)
     lines = [l.strip() for l in text.split("\n") if l.strip()]
     sentences = []
     for line in lines:
+        # runs of 2+ spaces often mark a merged-column boundary — treat as a break too
+        line = re.sub(r"\s{2,}", ". ", line)
         parts = re.split(r"(?<=[.!?])\s+", line)
         for p in parts:
-            p = p.strip(" -•\t")
+            p = p.strip(" -•\t_")
             if len(p) > 2:
                 sentences.append(p)
     return sentences

@@ -85,6 +85,11 @@ def list_documents() -> list[dict]:
     with get_connection() as conn:
         rows = conn.execute("SELECT doc_id, filename, doc_type, confidence, status, uploaded_at FROM documents ORDER BY uploaded_at DESC").fetchall()
         return [dict(r) for r in rows]
+    
+def delete_document(doc_id: str):
+    with get_connection() as conn:
+        conn.execute("DELETE FROM documents WHERE doc_id = ?", (doc_id,))
+    log_action(doc_id, "document_deleted", "Document removed")
 
 
 def get_audit_log(doc_id: str = None, limit: int = 100):
@@ -141,7 +146,7 @@ def get_dashboard_stats():
     # Uploads Per Day
     # --------------------------
     uploads = Counter(
-        d["uploaded_at"][:10]
+        d["uploaded_at"][11:13] + ":00"
         for d in docs
     )
 
