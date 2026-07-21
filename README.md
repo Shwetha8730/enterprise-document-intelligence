@@ -1,5 +1,23 @@
 # 📄 Enterprise AI Document Intelligence Platform
 
+### 🛠️ Built With
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
+![spaCy](https://img.shields.io/badge/spaCy-09A3D5?style=for-the-badge)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
+![Sentence Transformers](https://img.shields.io/badge/Sentence_Transformers-FF6F00?style=for-the-badge)
+![FAISS](https://img.shields.io/badge/FAISS-4CAF50?style=for-the-badge)
+![EasyOCR](https://img.shields.io/badge/EasyOCR-8E44AD?style=for-the-badge)
+
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![ReportLab](https://img.shields.io/badge/ReportLab-D32F2F?style=for-the-badge)
+
+
 Enterprise AI Document Intelligence Platform is an AI-powered application designed to simplify document analysis using Natural Language Processing (NLP), Optical Character Recognition (OCR), semantic search, and a multi-agent workflow.
 
 The platform enables users to upload documents, automatically classify them, extract important metadata, validate document completeness, generate summaries, answer questions based on document content, perform semantic search, and export detailed PDF analysis reports.
