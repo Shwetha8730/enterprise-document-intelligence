@@ -2,27 +2,67 @@
 
 Enterprise AI Document Intelligence Platform is an AI-powered application designed to simplify document analysis using Natural Language Processing (NLP), Optical Character Recognition (OCR), semantic search, and a multi-agent workflow.
 
-The platform enables users to upload PDF and text documents, automatically classify them, extract important metadata, validate document completeness, generate summaries, answer questions based on document content, perform semantic search, and export detailed PDF analysis reports.
+The platform enables users to upload documents, automatically classify them, extract important metadata, validate document completeness, generate summaries, answer questions based on document content, perform semantic search, and export detailed PDF analysis reports.
 
-The application demonstrates how machine learning, natural language processing, optical character recognition, and semantic search techniques can be integrated into a single intelligent document processing system through an interactive Streamlit interface.
+The platform combines classical machine learning, transformer-based Natural Language Processing, Optical Character Recognition, and semantic search into a unified document intelligence workflow. It is designed to showcase how enterprise document processing tasks can be automated through a scalable FastAPI backend and an interactive web interface.
 
 ---
 
 ## ✨ Features
 
-- 📤 Upload and process **PDF** and **TXT** documents
-- 🔍 OCR support for scanned PDF documents
+- 📤 Upload and process PDF, DOCX, PPTX, XLSX, CSV, TXT, PNG, JPG and JPEG documents
+- 🔍 OCR support for scanned PDF documents and images
 - 🏷️ AI-powered document classification
 - 📑 Metadata extraction using spaCy 
 - ✅ Document completeness validation
 - 📝 Extractive document summarization 
 - ❓ Question answering over uploaded documents
 - 🔎 Semantic search using FAISS
-- 📊 Analytics dashboard
+- 📊 Interactive analytics dashboard
 - 🧾 Audit logging for document processing
 - 📄 Export document analysis reports as PDF
-- 🚫 Prevent duplicate document processing using SHA-256 hashing
+- 🚫 Duplicate document detection using SHA-256 hashing
+- 🗑️ Document deletion
+- ⬇️ Download original uploaded document
 
+
+---
+
+## 🏗️ System Architecture
+
+```text
+Document Upload
+        │
+        ▼
+Text Extraction / OCR
+        │
+        ▼
+Document Classification
+        │
+        ▼
+Metadata Extraction
+        │
+        ▼
+Completeness Validation
+        │
+        ▼
+Document Summarization
+        │
+        ▼
+SQLite Storage
+        │
+        ▼
+FAISS Vector Index
+        │
+        ▼
+Semantic Search
+        │
+        ▼
+Question Answering
+        │
+        ▼
+Analytics Dashboard
+```
 ---
 
 ## 📷 Screenshots
@@ -31,81 +71,106 @@ The application demonstrates how machine learning, natural language processing, 
 
 ![Home Dashboard](screenshots/home_dashboard.png)
 
+
 ### 📄 Document Analysis
 
 ![Document Analysis](screenshots/document_analysis.png)
+
 
 ### 🔍 Semantic Search
 
 ![Semantic Search](screenshots/semantic_search.png)
 
+
+### 🧾 Audit Log
+
+![Audit Log](screenshots/audit_log.png)
+
+
 ### 📊 Analytics Dashboard
 
 ![Analytics Dashboard](screenshots/analytics_dashboard.png)
+
 
 ---
 
 ## 🧠 How It Works
 
 
-1. Upload a PDF or TXT document.
-2. Extract text using pdfplumber or EasyOCR for scanned PDFs.
-3. Classify the document using AI models.
-4. Extract metadata using spaCy.
+1. Upload one or more supported documents.
+2. Extract text using pdfplumber or EasyOCR for scanned PDFs and images.
+3. Classify the document using a multi-agent pipeline.
+4. Extract metadata using spaCy NER.
 5. Validate document completeness.
 6. Generate a document summary.
 7. Create embeddings for semantic search.
 8. Search documents or ask questions.
 9. Export the analysis report as a PDF.
+10. Every action is logged to a SQLite audit trail.
+11. View aggregate analytics across all processed documents.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer | Tools |
-|---|---|
-| Language | Python |
-| API | FastAPI, Pydantic, Uvicorn |
-| UI / Dashboard | Streamlit |
-| NLP | spaCy, Sentence-Transformers |
-| Classical ML | scikit-learn (TF-IDF, Naive Bayes, Logistic Regression, cosine similarity) |
-| OCR | EasyOCR, pdf2image, Pillow |
-| PDF Parsing | pdfplumber |
-| Semantic Search | FAISS |
-| Database | SQLite |
-| Report Generation | ReportLab |
-| Numerical Computing | NumPy |
+| Layer | Technologies |
+|--------|--------------|
+| **Programming Language** | Python |
+| **Backend Framework** | FastAPI, Uvicorn, Pydantic |
+| **Frontend** | HTML5, CSS3, JavaScript, Chart.js |
+| **Natural Language Processing (NLP)** | spaCy, Sentence-Transformers |
+| **Machine Learning** | Scikit-learn (TF-IDF, Naive Bayes, Logistic Regression) |
+| **Semantic Search** | FAISS |
+| **OCR & Image Processing** | EasyOCR, pdf2image, Pillow |
+| **Document Processing** | pdfplumber, python-docx, python-pptx, openpyxl, pandas |
+| **Database** | SQLite |
+| **Report Generation** | ReportLab |
+| **Numerical Computing** | NumPy |
 
 ---
 
 ## 📂 Project Structure
 
 ```text
+
 enterprise-document-intelligence/
 │
 ├── app/
 │   ├── agents/
-│   │   ├── summarizer_agent.py       # TF-IDF extractive summarization
-│   │   ├── qa_agent.py               # TF-IDF similarity-based Q&A
-│   │   ├── completeness_agent.py     # Required-field validation per doc type
-│   │   └── search_agent.py           # Wraps the FAISS vector index for search
+│   │   ├── completeness_agent.py
+│   │   ├── qa_agent.py
+│   │   ├── search_agent.py
+│   │   └── summarizer_agent.py
 │   │
-│   ├── classifier.py                 # TF-IDF + Naive Bayes classifier (+ keyword fallback)
-│   ├── semantic_classifier.py        # Sentence-Transformers + Logistic Regression classifier
-│   ├── extractor.py                  # Text extraction (pdfplumber) + OCR fallback (EasyOCR)
-│   ├── metadata_extractor.py         # spaCy-based entity & field extraction
-│   ├── embeddings.py                 # Embedding model wrapper (Sentence-Transformers / TF-IDF)
-│   ├── vector_index.py               # FAISS index build/search over chunked documents
-│   ├── text_utils.py                 # Sentence splitting & chunking utilities
-│   ├── orchestrator.py               # Coordinates the full multi-agent pipeline
-│   ├── database.py                   # SQLite persistence, audit log, dashboard stats
-│   ├── report_generator.py           # ReportLab PDF report export
-│   ├── seed_data.py                  # Training data for the classifiers
-│   └── main.py                       # FastAPI app & REST endpoints
+│   │
+│   ├── __init__.py
+│   ├── classifier.py
+│   ├── database.py
+│   ├── embeddings.py
+│   ├── extractor.py
+│   ├── metadata_extractor.py
+│   ├── orchestrator.py
+│   ├── report_generator.py
+│   ├── seed_data.py
+│   ├── semantic_classifier.py
+│   ├── text_utils.py
+│   └── vector_index.py
 │
-├── demo_ui.py                        # Streamlit dashboard (Upload, Search, Audit Log, Analytics)
-├── requirements.txt
-└── README.md
+│
+├── static/
+│   ├── css/
+│   │   └── styles.css
+│   ├── js/
+│   │   ├── app.js
+│   │   └── chart.umd.min.js
+│   ├── favicon.ico
+│   └── index.html
+│
+│
+├── .gitignore
+├── demo_ui.py           # FastAPI entry point — run this with uvicorn
+├── README.md
+└── requirements.txt
 ```
 
 ---
@@ -115,7 +180,7 @@ enterprise-document-intelligence/
 
 - Document type distribution (bar chart)
 - Classification confidence by document type
-- Upload activity over time
+- Documents processed KPI
 - Per-document classification, metadata, summary, completeness check, and Q&A — all in one view
 - Full audit trail table
 - One-click PDF report export and original document download
@@ -125,18 +190,31 @@ enterprise-document-intelligence/
 ## ⚙️ Installation
 
 ```bash
+git clone https://github.com/Shwetha8730/enterprise-document-intelligence.git
+
+cd enterprise-document-intelligence
+
 pip install -r requirements.txt
-streamlit run demo_ui.py
+
+python -m spacy download en_core_web_sm
+
+py -m uvicorn demo_ui:app --reload --port 8000
 ```
+Then open **http://127.0.0.1:8000** in your browser.
+
 ---
  
 ## 📈 Future Enhancements
 
-- Support for Word (`.docx`) and Excel (`.xlsx`) documents
-- Cloud object storage for raw document text (currently held in memory per session)
+- Docker deployment
+- Cloud deployment
+- Per-user session isolation and authentication
+- Role-based access control
+- Persistent, cross-session FAISS index and document text cache
+- Cloud object storage for raw document text 
 - Fine-tuned transformer models for enterprise-specific document classification
-- Multi-user authentication and role-based access control
-- Persistent, cross-session FAISS index (currently rebuilt per app session)
+- Advanced NER for domain-specific fields
+- Multi-user collaboration features.
 
 ---
 
@@ -144,12 +222,12 @@ streamlit run demo_ui.py
 
 Through this project, I gained practical experience in:
 
-- Natural Language Processing
+- Natural Language Processing (NLP)
 - Optical Character Recognition (OCR)
 - Semantic Search
 - Multi-Agent AI Systems
-- FastAPI Development
-- Streamlit Dashboard Development
+- FastAPI REST API Development
+- Frontend Development using HTML, CSS and JavaScript
 - SQLite Database Design
 - Enterprise Document Processing
 
@@ -162,5 +240,7 @@ Through this project, I gained practical experience in:
 B.Tech – Information Science & Engineering (AI & Robotics)
 
 Presidency University, Bengaluru.
+
+GitHub: https://github.com/Shwetha8730
 
 ---

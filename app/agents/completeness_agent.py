@@ -3,8 +3,6 @@ class CompletenessAgent:
 
     def run(self, metadata: dict, doc_type: str) -> dict:
         missing = metadata.get("missing_fields", [])
-        print(type(missing))
-        print(missing)
         is_complete = len(missing) == 0
 
         if is_complete:

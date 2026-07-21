@@ -91,9 +91,7 @@ async function handleFiles(fileList) {
             }
 
             await refreshDocList();
-            console.log("About to select:", data.doc_id);
             await selectDocument(data.doc_id);
-            console.log("selectDocument finished");
         } catch (e) {
             toast(`Failed to process ${file.name}: ${e.message}`);
         }
@@ -162,28 +160,20 @@ function renderDocList() {
 }
 
 async function selectDocument(docId) {
-    console.log("selectDocument:", docId);
     state.activeDocId = docId;
     renderDocList();
 
     let doc = state.docCache[docId];
-    console.log("cached:", doc);
     if (!doc) {
-        console.log("Fetching document...");
         doc = await api(`/api/documents/${docId}`);
-        console.log("Fetched:", doc);
         state.docCache[docId] = doc;
     }
-    console.log("Calling renderDocDetail...");
     renderDocDetail(doc);
 }
 
 function renderDocDetail(doc) {
-    console.log("renderDocDetail START");
-    console.log(doc);
     try {
         const result = doc.result;
-        console.log(result);
     $("#doc-detail").style.display = "block";
 
     const cls = result.classification;
@@ -226,11 +216,9 @@ function renderDocDetail(doc) {
     $("#question-input").value = "";
     $("#ask-btn").onclick = () => askQuestion(doc.doc_id);
     $("#question-input").onkeydown = (e) => { if (e.key === "Enter") askQuestion(doc.doc_id); };
-    console.log("renderDocDetail FINISHED");
 
     } catch (err) {
-        console.error("ERROR INSIDE renderDocDetail");
-        console.error(err);
+        console.error("Failed to render document details:", err);
     }
 }
 async function askQuestion(docId) {
@@ -341,15 +329,13 @@ async function loadAnalytics() {
         `).join("");
 
         if (typeof Chart === "undefined") {
-          console.log("Chart.js not loaded");
+          console.error("Chart.js failed to load.");
           toast("Chart.js not loaded");
           return;
     }
 
         destroyChart("dist");
         const canvas = $("#chart-distribution");
-        console.log(canvas);
-        console.log(canvas.getContext("2d"));
 
         charts.dist = new Chart(canvas.getContext("2d"), {
             type: "bar",
@@ -397,8 +383,8 @@ async function initializeApp() {
             method: "POST"
         });
     } catch (e) {
-        console.log("Session reset skipped");
-    }
+    toast("Unable to reset previous session.");
+}
 
     await loadMeta();
     await refreshDocList();
