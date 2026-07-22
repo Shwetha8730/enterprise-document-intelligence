@@ -15,7 +15,7 @@ from app import database
 from app.report_generator import generate_pdf_report
 
 app = FastAPI(title="Document Intelligence Platform API")
-
+database.init_db()
 orchestrator = DocumentOrchestrator()
 
 DOCS: dict[str, dict] = {}
